@@ -8,16 +8,14 @@
 
     <style>
         body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
             font-family: 'Arial', sans-serif;
             background-color: #000;
             scroll-behavior: smooth;
         }
 
-        /* PANTALLA DE CARGA */
+        /* PANTALLA DE CARGA (FORZADA) */
         #splash-screen {
             position: fixed;
             top: 0; left: 0;
@@ -44,26 +42,19 @@
 
         @keyframes blink { 0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; } }
 
-        /* CONTENIDO PRINCIPAL */
+        /* CONTENIDO DEL MENÚ */
         #main-content {
             width: 100%;
-            /* Ya no usamos display:none para que el navegador empiece 
-               a renderizar la imagen desde el segundo 1 por debajo */
-            visibility: hidden; 
-            height: 0;
-            overflow: hidden;
-        }
-
-        #main-content.activo {
-            visibility: visible;
-            height: auto;
-            overflow: visible;
+            /* Se mantiene visible pero detrás del splash para que cargue de una vez */
+            display: block; 
         }
 
         .imagen-larga {
             width: 100%;
             height: auto;
             display: block;
+            /* Prioriza que se vea lo que vaya descargando */
+            image-rendering: auto;
         }
 
         #btn-arriba {
@@ -73,6 +64,7 @@
             z-index: 99; border: none;
             background-color: #e74c3c; color: white;
             width: 55px; height: 55px; border-radius: 50%;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.4);
         }
 
         .flecha {
@@ -97,25 +89,24 @@
     <button onclick="irArriba()" id="btn-arriba"><i class="flecha"></i></button>
 
     <div id="main-content">
-        <img src="imagenmenu.png" alt="MENÚ RHONALDSPIZZA" class="imagen-larga" decoding="async">
+        <img src="imagenmenu.png" alt="MENÚ RHONALDSPIZZA" class="imagen-larga" loading="eager" decoding="async">
     </div>
 
     <script>
-        // DOMContentLoaded NO espera a que la imagen cargue, solo al HTML
-        document.addEventListener('DOMContentLoaded', () => {
+        // Usamos una función autoejecutable inmediata para no esperar NADA
+        (function() {
             const splash = document.getElementById('splash-screen');
-            const main = document.getElementById('main-content');
-
-            // Cronómetro forzado de 5 segundos
+            
+            // Forzamos los 5 segundos sin importar el estado de la imagen
             setTimeout(() => {
                 splash.classList.add('fade-out');
-                main.classList.add('activo');
                 
+                // Después de que se desvanezca, lo quitamos para que no estorbe
                 setTimeout(() => {
                     splash.style.display = 'none';
                 }, 800);
             }, 5000); 
-        });
+        })();
 
         window.onscroll = function() {
             const btnArriba = document.getElementById('btn-arriba');
